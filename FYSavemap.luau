@@ -33,7 +33,7 @@ end
 
 local global_container
 do
-	local filename = "MethodFinder"
+	local filename = "UniversalMethodFinder"
 
 	local finder
 	finder, global_container = loadstring(
@@ -65,13 +65,13 @@ local EXECUTOR_NAME = identify_executor and identify_executor() or ""
 -- local cloneref = global_container.cloneref
 local gethiddenproperty = global_container.gethiddenproperty
 
--- These should be  enough
+-- These should be universal enough
 local appendfile = appendfile
 local isfile = isfile
 local readfile = readfile
 local writefile = writefile
 
-local getscriptbytecode = global_container.getscriptbytecode -- * A lot of assumptions are made based on whether this function is defined or not. So in certain edge cases, like if the executor defines "decompile" or "getscripthash" function yet doesn't define this function there might be loss of functionality of the SaveMap. Although that would be very rare and weird
+local getscriptbytecode = global_container.getscriptbytecode -- * A lot of assumptions are made based on whether this function is defined or not. So in certain edge cases, like if the executor defines "decompile" or "getscripthash" function yet doesn't define this function there might be loss of functionality of the saveinstance. Although that would be very rare and weird
 local base64encode = global_container.base64encode
 
 local service = setmetatable({}, {
@@ -1334,8 +1334,8 @@ do
 
 	local NotScriptableFixes = { --[[
 		For more info:
-		- https://github.com/luau/FySaveMap/blob/main/Tools/NotScriptable-Related/Potentially%20Missing%20Properties%20Dumper/Potentially%20Missing%20Properties%20Dumper.luau
-		- https://github.com/luau/FySaveMap/blob/main/Tools/NotScriptable-Related/NotScriptable%20Dumper/NotScriptable%20Dumper.py
+		- https://github.com/luau/UniversalSynSaveInstance/blob/main/Tools/NotScriptable-Related/Potentially%20Missing%20Properties%20Dumper/Potentially%20Missing%20Properties%20Dumper.luau
+		- https://github.com/luau/UniversalSynSaveInstance/blob/main/Tools/NotScriptable-Related/NotScriptable%20Dumper/NotScriptable%20Dumper.py
 		]]
 		Instance = {
 			AttributesSerialize = function(instance)
@@ -1981,7 +1981,7 @@ do
 							Example: Humanoid.Health is CanSave false due to Humanoid.Health_XML being CanSave true (obsolete properties basically) - in this case both of them will Load. (aka PropertyPatches)
 							CanSave being on same level as CanLoad also fixes potential issues with overlapping properties like Color, Color3 & Color3uint8 of BasePart, out of which only Color3uint8 should save
 							This also fixes everything in IgnoreClassProperties automatically without need to hardcode :)
-							A very simple fix for many problems that SaveMap scripts encounter!
+							A very simple fix for many problems that saveinstance scripts encounter!
 						--]]
 						local PropertyName = Member.Name
 						if
@@ -2102,18 +2102,18 @@ end
 local GLOBAL_ENV = getgenv and getgenv() or _G or shared
 
 --[=[
-    @class FySaveMap
-    Represents the options for saving instances with custom settings using the fysavemap function.
+    @class SynSaveInstance
+    Represents the options for saving instances with custom settings using the synsaveinstance function.
 ]=]
 
 --- @interface CustomOptions table
 --- * Structure of the main CustomOptions table.
 --- * Note: Options are case-insensitive, meaning you could type `NilInstances` option as `nilInStaNces` and it would still be valid.
---- @within FySaveMap
+--- @within SynSaveInstance
 --- @field __DEBUG_MODE boolean -- This will print debug logs to console about unusual scenarios. Recommended to enable if you wish to help us improve our products and find bugs / issues with it! ___Default:___ false
 --- @field ReadMe boolean --___Default:___ true
 --- @field SafeMode boolean -- Kicks you before Saving, which prevents you from being detected in any game. ___Default:___ false
---- @field ShutdownWhenDone boolean -- Shuts the game down after SaveMap is finished. ___Default:___ false
+--- @field ShutdownWhenDone boolean -- Shuts the game down after saveinstance is finished. ___Default:___ false
 --- @field AntiIdle boolean -- Prevents the 20-minute-Idle Kick. ___Default:___ true
 --- .Anonymous {boolean|table{UserId = string, Name = string}} -- * **RISKY:** Cleans the file of any info related to your account like: Name, UserId. This is useful for some games that might store that info in GUIs or other Instances. Might potentially mess up parts of strings that contain characters that match your Name or parts of numbers that match your UserId. Can also be a table with UserId & Name keys. ___Default:___ false
 --- @field ShowStatus boolean -- ___Default:___ true
@@ -2146,7 +2146,7 @@ local GLOBAL_ENV = getgenv and getgenv() or _G or shared
 --- @field RemovePlayerCharacters boolean -- Ignore player characters while saving. (Enables SaveNotCreatable automatically). ___Default:___ true
 --- @field SaveNotCreatable boolean -- * Includes non-serializable instances as Folder objects (Name is misleading as this is mostly a fix for certain NilInstances and isn't always related to NotCreatable). ___Default:___ false
 --- .NotCreatableFixes table<Instance.ClassName> -- * {"Player"} is the same as {Player = "Folder"}; Format like {SpawnLocation = "Part"} is only to be used when SpawnLocation inherits from "Part" AND "Part" is Creatable. ___Default:___ { "", "Player", "PlayerScripts", "PlayerGui", "TouchTransmitter" }
---- @field IsolatePlayers boolean -- * This option does save players, it's just they won't show up in Studio and can only be viewed through the place file code (in text editor). More info at https://github.com/luau/FySaveMap/issues/2. ___Default:___ false
+--- @field IsolatePlayers boolean -- * This option does save players, it's just they won't show up in Studio and can only be viewed through the place file code (in text editor). More info at https://github.com/luau/UniversalSynSaveInstance/issues/2. ___Default:___ false
 --- @field AlternativeWritefile boolean -- * Splits file content string into segments and writes them using appendfile. This might help with crashes when it starts writing to file. Though there is a risk of appendfile working incorrectly on some executors. ___Default:___ true
 --- @field IgnoreDefaultPlayerScripts boolean -- * **RISKY: Ignores Default PlayerScripts like PlayerModule & RbxCharacterSounds. Prevents crashes on certain Executors. ___Default:___ true
 --- @field IgnoreSharedStrings boolean -- * **RISKY: FIXES CRASHES (TEMPORARY, TESTED ON ROEXEC ONLY). FEEL FREE TO DISABLE THIS TO SEE IF IT WORKS FOR YOU**. ___Default:___ true
@@ -2154,8 +2154,8 @@ local GLOBAL_ENV = getgenv and getgenv() or _G or shared
 --- @field TreatUnionsAsParts boolean -- * **RISKY:** Converts all UnionOperations to Parts. Useful if your Executor isn't able to save (read) Unions, because otherwise they will be invisible. ___Default:___ false (except Solara)
 
 --- @interface OptionsAliases
---- @within FySaveMap
---- Aliases for the [FySaveMap.CustomOptions table]. Format: {Option -- Alias1, Alias2}
+--- @within SynSaveInstance
+--- Aliases for the [SynSaveInstance.CustomOptions table]. Format: {Option -- Alias1, Alias2}
 --- @field FilePath string -- FileName
 --- @field IgnoreDefaultProperties string -- IgnoreDefaultProps
 --- @field SaveNotCreatable string -- SaveNonCreatable
@@ -2168,27 +2168,27 @@ local GLOBAL_ENV = getgenv and getgenv() or _G or shared
 --- @field RemovePlayerCharacters string -- INVERSE SavePlayerCharacters
 
 --[=[
-	@function SaveMap
+	@function saveinstance
 	Saves instances with specified options. Example:
 	```lua
 	local Params = {
-		RepoURL = "https://raw.githubusercontent.com/luau/FySaveMap/main/",
-		SSI = "SaveMap",
+		RepoURL = "https://raw.githubusercontent.com/luau/UniversalSynSaveInstance/main/",
+		SSI = "saveinstance",
 	}
 
-	local fysavemap = loadstring(game:HttpGet(Params.RepoURL .. Params.SSI .. ".luau", true), Params.SSI)()
+	local synsaveinstance = loadstring(game:HttpGet(Params.RepoURL .. Params.SSI .. ".luau", true), Params.SSI)()
 
 	local CustomOptions = { SafeMode = true, timeout = 15, SaveBytecode = true }
 
-	fysavemap(CustomOptions)
+	synsaveinstance(CustomOptions)
 	```
-	@within FySaveMap
+	@within SynSaveInstance
 	@yields
-	@param Parameter_1 variant<table, table<Instance>> -- Can either be [FySaveMap.CustomOptions table] or a filled with instances ({Instance}), (then it will be treated as ExtraInstances with an invalid mode and IsModel will be true).
-	@param Parameter_2 table -- [OPTIONAL] If present, then Parameter_2 will be assumed to be [FySaveMap.CustomOptions table]. And then if the Parameter_1 is an Instance, then it will be assumed to be [FySaveMap.CustomOptions table].Object. If Parameter_1 is a table filled with instances ({Instance}), then it will be assumed to be [FySaveMap.CustomOptions table].ExtraInstances and IsModel will be true). This exists for sake compatibility with `SaveMap(game, {})`
+	@param Parameter_1 variant<table, table<Instance>> -- Can either be [SynSaveInstance.CustomOptions table] or a filled with instances ({Instance}), (then it will be treated as ExtraInstances with an invalid mode and IsModel will be true).
+	@param Parameter_2 table -- [OPTIONAL] If present, then Parameter_2 will be assumed to be [SynSaveInstance.CustomOptions table]. And then if the Parameter_1 is an Instance, then it will be assumed to be [SynSaveInstance.CustomOptions table].Object. If Parameter_1 is a table filled with instances ({Instance}), then it will be assumed to be [SynSaveInstance.CustomOptions table].ExtraInstances and IsModel will be true). This exists for sake compatibility with `saveinstance(game, {})`
 ]=]
 
-local function fysavemap(CustomOptions, CustomOptions2)
+local function synsaveinstance(CustomOptions, CustomOptions2)
 	if GLOBAL_ENV.USSI then
 		return
 	end
@@ -2447,13 +2447,13 @@ local function fysavemap(CustomOptions, CustomOptions2)
 		local text = 'Function "writefile" is NOT available\nUse the Option "Callback" instead for now (check docs)'
 
 		coreCall("SetCore", "SendNotification", {
-			Title = "SaveMap ERROR",
+			Title = "SAVEINSTANCE ERROR",
 			Text = text,
 			Duration = 15,
 			Icon = "rbxassetid://9072920609",
 		})
 		coreCall("SetCore", "SendNotification", {
-			Title = "SaveMap ERROR",
+			Title = "SAVEINSTANCE ERROR",
 			Text = "Please ask your executor's developers to add writefile",
 			Duration = 15,
 			Icon = "rbxassetid://9072920609",
@@ -2518,10 +2518,10 @@ local function fysavemap(CustomOptions, CustomOptions2)
 
 	local FilePath = OPTIONS.FilePath
 	local SaveCacheInterval = OPTIONS.SaveCacheInterval
-	local ToSaveMap = OPTIONS.Object
+	local ToSaveInstance = OPTIONS.Object
 	local IsModel = OPTIONS.IsModel
 
-	if ToSaveMap and CustomOptions.IsModel == nil then
+	if ToSaveInstance and CustomOptions.IsModel == nil then
 		IsModel = true
 	end
 
@@ -2562,9 +2562,9 @@ local function fysavemap(CustomOptions, CustomOptions2)
 		GLOBAL_ENV.scriptcache = ldeccache
 	end
 
-	if ToSaveMap == game then
+	if ToSaveInstance == game then
 		OPTIONS.mode = "full"
-		ToSaveMap = nil
+		ToSaveInstance = nil
 		IsModel = nil
 	end
 
@@ -2586,7 +2586,7 @@ local function fysavemap(CustomOptions, CustomOptions2)
 			return string.sub(string.gsub(string.gsub(string.gsub(str, "[^%w _]", ""), " +", " "), " +$", ""), 1, 240)
 		end
 
-		if ToSaveMap then
+		if ToSaveInstance then
 			if mode == "optimized" then -- ! NOT supported with Model file mode
 				mode = "full"
 			end
@@ -2612,7 +2612,7 @@ local function fysavemap(CustomOptions, CustomOptions2)
 			placename = FilePath
 		elseif IsModel then
 			placename =
-				sanitizeFileName("model " .. PlaceName .. " " .. (ToSaveMap or tmp[1] or game):GetFullName())
+				sanitizeFileName("model " .. PlaceName .. " " .. (ToSaveInstance or tmp[1] or game):GetFullName())
 		else
 			placename = sanitizeFileName("place " .. PlaceName)
 		end
@@ -2632,7 +2632,7 @@ local function fysavemap(CustomOptions, CustomOptions2)
 		end
 
 		if GLOBAL_ENV[placename] then
-			-- warn("FySaveMap is already saving to this file")
+			-- warn("UniversalSynSaveInstance is already saving to this file")
 			return
 		end
 
@@ -2643,10 +2643,10 @@ local function fysavemap(CustomOptions, CustomOptions2)
 			IgnorePropertiesOfNotScriptsOnScriptsMode = nil
 		end
 
-		local TempRoot = ToSaveMap or game
+		local TempRoot = ToSaveInstance or game
 
 		if mode == "full" then
-			if not ToSaveMap then
+			if not ToSaveInstance then
 				local Children = TempRoot:GetChildren()
 				if 0 < #Children then
 					local tmp_dict = ArrayToDict(tmp)
@@ -2719,8 +2719,8 @@ local function fysavemap(CustomOptions, CustomOptions2)
 
 		ToSaveList = tmp
 
-		if ToSaveMap then
-			table.insert(ToSaveList, 1, ToSaveMap)
+		if ToSaveInstance then
+			table.insert(ToSaveList, 1, ToSaveInstance)
 		end
 	end
 
@@ -3636,7 +3636,7 @@ local function fysavemap(CustomOptions, CustomOptions2)
 						RecoveredScripts
 					) .. "\n" or "")
 					.. [[
-		Thank you for using FySaveMap (Join to Copy Games) https://discord.gg/JnUtNJWmjW.
+		Thank you for using UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/JnUtNJWmjW.
 
 		If you didn't save in Binary (rbxl) - it's recommended to save the game right away to take advantage of the binary format & to preserve values of certain properties if you used IgnoreDefaultProperties setting (as they might change in the future).
 		You can do that by going to FILE -> Save to File As -> Make sure File Name ends with .rbxl -> Save
@@ -3674,7 +3674,7 @@ local function fysavemap(CustomOptions, CustomOptions2)
 					.. "\n\n\t\tElapsed time: "
 					.. os.clock() - elapse_t
 					.. " Date (UTC): "
-					.. DateTime.now():FormatTime("LL LTS", "en-gb")
+					.. DateTime.now():FormatUniversalTime("LL LTS", "en-gb")
 					.. " PlaceId: "
 					.. game.PlaceId
 					.. " PlaceVersion: "
@@ -4040,4 +4040,4 @@ local function fysavemap(CustomOptions, CustomOptions2)
 	end
 end
 
-return fysavemap
+return synsaveinstance
