@@ -1,5 +1,6 @@
--- Made by Saveinstance 
--- Remake by FayintXCode 
+--!native
+--!optimize 2
+--!divine-intellect
 -- https://discord.gg/JnUtNJWmjW
 
 local function string_find(s, pattern)
