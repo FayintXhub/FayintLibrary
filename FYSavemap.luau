@@ -32,7 +32,7 @@ end
 
 local global_container
 do
-	local filename = "UniversalMethodFinder"
+	local filename = "MethodFinder"
 
 	local finder
 	finder, global_container = loadstring(
@@ -64,7 +64,7 @@ local EXECUTOR_NAME = identify_executor and identify_executor() or ""
 -- local cloneref = global_container.cloneref
 local gethiddenproperty = global_container.gethiddenproperty
 
--- These should be universal enough
+-- These should be  enough
 local appendfile = appendfile
 local isfile = isfile
 local readfile = readfile
@@ -1333,8 +1333,8 @@ do
 
 	local NotScriptableFixes = { --[[
 		For more info:
-		- https://github.com/luau/UniversalFySaveMap/blob/main/Tools/NotScriptable-Related/Potentially%20Missing%20Properties%20Dumper/Potentially%20Missing%20Properties%20Dumper.luau
-		- https://github.com/luau/UniversalFySaveMap/blob/main/Tools/NotScriptable-Related/NotScriptable%20Dumper/NotScriptable%20Dumper.py
+		- https://github.com/luau/FySaveMap/blob/main/Tools/NotScriptable-Related/Potentially%20Missing%20Properties%20Dumper/Potentially%20Missing%20Properties%20Dumper.luau
+		- https://github.com/luau/FySaveMap/blob/main/Tools/NotScriptable-Related/NotScriptable%20Dumper/NotScriptable%20Dumper.py
 		]]
 		Instance = {
 			AttributesSerialize = function(instance)
@@ -2145,7 +2145,7 @@ local GLOBAL_ENV = getgenv and getgenv() or _G or shared
 --- @field RemovePlayerCharacters boolean -- Ignore player characters while saving. (Enables SaveNotCreatable automatically). ___Default:___ true
 --- @field SaveNotCreatable boolean -- * Includes non-serializable instances as Folder objects (Name is misleading as this is mostly a fix for certain NilInstances and isn't always related to NotCreatable). ___Default:___ false
 --- .NotCreatableFixes table<Instance.ClassName> -- * {"Player"} is the same as {Player = "Folder"}; Format like {SpawnLocation = "Part"} is only to be used when SpawnLocation inherits from "Part" AND "Part" is Creatable. ___Default:___ { "", "Player", "PlayerScripts", "PlayerGui", "TouchTransmitter" }
---- @field IsolatePlayers boolean -- * This option does save players, it's just they won't show up in Studio and can only be viewed through the place file code (in text editor). More info at https://github.com/luau/UniversalFySaveMap/issues/2. ___Default:___ false
+--- @field IsolatePlayers boolean -- * This option does save players, it's just they won't show up in Studio and can only be viewed through the place file code (in text editor). More info at https://github.com/luau/FySaveMap/issues/2. ___Default:___ false
 --- @field AlternativeWritefile boolean -- * Splits file content string into segments and writes them using appendfile. This might help with crashes when it starts writing to file. Though there is a risk of appendfile working incorrectly on some executors. ___Default:___ true
 --- @field IgnoreDefaultPlayerScripts boolean -- * **RISKY: Ignores Default PlayerScripts like PlayerModule & RbxCharacterSounds. Prevents crashes on certain Executors. ___Default:___ true
 --- @field IgnoreSharedStrings boolean -- * **RISKY: FIXES CRASHES (TEMPORARY, TESTED ON ROEXEC ONLY). FEEL FREE TO DISABLE THIS TO SEE IF IT WORKS FOR YOU**. ___Default:___ true
@@ -2171,7 +2171,7 @@ local GLOBAL_ENV = getgenv and getgenv() or _G or shared
 	Saves instances with specified options. Example:
 	```lua
 	local Params = {
-		RepoURL = "https://raw.githubusercontent.com/luau/UniversalFySaveMap/main/",
+		RepoURL = "https://raw.githubusercontent.com/luau/FySaveMap/main/",
 		SSI = "SaveMap",
 	}
 
@@ -2202,7 +2202,7 @@ local function fysavemap(CustomOptions, CustomOptions2)
 	local currentstr, currentsize, totalsize, chunks = "", 0, 0, table.create(1)
 	local savebuffer, savebuffer_size = {}, 1
 	local header =
-		'<!-- Saved by UniversalFySaveMap (Join to Copy Games) https://discord.gg/JnUtNJWmjW --><roblox version="4">'
+		'<!-- Saved by FayintXCode (Join to Copy Games) https://discord.gg/JnUtNJWmjW --><roblox version="4">'
 
 	local StatusText
 
@@ -2631,7 +2631,7 @@ local function fysavemap(CustomOptions, CustomOptions2)
 		end
 
 		if GLOBAL_ENV[placename] then
-			-- warn("UniversalFySaveMap is already saving to this file")
+			-- warn("FySaveMap is already saving to this file")
 			return
 		end
 
@@ -3440,7 +3440,7 @@ local function fysavemap(CustomOptions, CustomOptions2)
 											end
 										end
 
-										value = "-- Saved by UniversalFySaveMap (Join to Copy Games) https://discord.gg/JnUtNJWmjW\n\n"
+										value = "-- Saved by FayintXCode (Join to Copy Games) https://discord.gg/JnUtNJWmjW\n\n"
 											.. (hasLinkedSource and "-- Original Source: https://assetdelivery.roblox.com/v1/asset/?" .. (LinkedSource_type or "id") .. "=" .. (LinkedSource or LinkedSource_Url) .. "\n\n" or "")
 											.. value
 									end
@@ -3635,7 +3635,7 @@ local function fysavemap(CustomOptions, CustomOptions2)
 						RecoveredScripts
 					) .. "\n" or "")
 					.. [[
-		Thank you for using UniversalFySaveMap (Join to Copy Games) https://discord.gg/JnUtNJWmjW.
+		Thank you for using FySaveMap (Join to Copy Games) https://discord.gg/JnUtNJWmjW.
 
 		If you didn't save in Binary (rbxl) - it's recommended to save the game right away to take advantage of the binary format & to preserve values of certain properties if you used IgnoreDefaultProperties setting (as they might change in the future).
 		You can do that by going to FILE -> Save to File As -> Make sure File Name ends with .rbxl -> Save
@@ -3673,7 +3673,7 @@ local function fysavemap(CustomOptions, CustomOptions2)
 					.. "\n\n\t\tElapsed time: "
 					.. os.clock() - elapse_t
 					.. " Date (UTC): "
-					.. DateTime.now():FormatUniversalTime("LL LTS", "en-gb")
+					.. DateTime.now():FormatTime("LL LTS", "en-gb")
 					.. " PlaceId: "
 					.. game.PlaceId
 					.. " PlaceVersion: "
@@ -3700,7 +3700,7 @@ local function fysavemap(CustomOptions, CustomOptions2)
 		end
 
 		savebuffer[savebuffer_size] =
-			"</roblox><!-- Saved by UniversalFySaveMap (Join to Copy Games) https://discord.gg/JnUtNJWmjW -->"
+			"</roblox><!-- Saved by FayintXCode (Join to Copy Games) https://discord.gg/JnUtNJWmjW -->"
 		savebuffer_size += 1
 		save_cache(true)
 		do
